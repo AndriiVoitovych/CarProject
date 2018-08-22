@@ -1,6 +1,6 @@
 from django.db import models
 
-# Create your models here.
+
 class Car(models.Model):
     DIESEL = 'D'
     PETROL = 'P'
@@ -12,9 +12,10 @@ class Car(models.Model):
         (LPG, 'LPG')
     )
 
-    brand = models.CharField(max_length = 200)
-    model = models.CharField(max_length = 200)
-    product_date = models.DateField('product date')
+    brand = models.CharField(max_length=30)
+    model_name = models.CharField(max_length=200, verbose_name='model')
+    product_year = models.PositiveIntegerField()
+    mileage = models.PositiveIntegerField()
 
     fuel_type = models.CharField(
         max_length=1,
@@ -22,13 +23,31 @@ class Car(models.Model):
         default=PETROL,
     )
 
-    def str(self):
-        return self.brand + " " + self.model
+    def __str__(self):
+        return self.brand + " " + self.model_name
 
-class MileageHistory(models.Model):
+
+class Service(models.Model):
+    name = models.CharField(max_length=200)
+    period = models.PositiveIntegerField()
+
+    def __str__(self):
+        return self.name
+
+
+class ServiceHistory(models.Model):
+    service = models.ForeignKey(Service, on_delete=models.CASCADE)
     car = models.ForeignKey(Car, on_delete=models.CASCADE)
-    mileage = models.IntegerField()
-    date = models.DateField()
+    current_mileage = models.PositiveIntegerField()
+    date = models.DateField(auto_now_add=True)
 
-    def str(self):
-        return str(self.mileage) + " " + str(self.date)
+    class Meta:
+        verbose_name_plural = 'Service histories'
+        ordering = ('current_mileage',)
+
+    def save(self, *args, **kwargs):
+        self.current_mileage = self.car.mileage
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return '%s - %s - %skm' % (self.service, self.car, self.current_mileage)

@@ -1,0 +1,48 @@
+{% extends 'CarManagement/wrapper.html' %}
+{% load widget_tweaks extras %}
+
+{% block content %}
+    <form action="." method="POST">
+        {% csrf_token %}
+        <div class="form-row align-items-center">
+            {% for field in form %}
+                <div class="col-auto">
+                    <label for="{{ field.auto_id }}">{{ field.label }}</label>
+                </div>
+                <div class="col-auto">
+                    {{ field|add_class:'form-control' }}
+                    {{ field.errors }}
+                </div>
+            {% endfor %}
+            <div class="col-auto">
+                <button type="submit" class="btn btn-success">SAVE</button>
+            </div>
+        </div>
+
+    </form>
+    <br>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Next</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for service in services %}
+            <tr>
+                <td>
+                    {{ service.name }}
+                </td>
+                <td>
+                    {% calculate_next_service service car as calc %}
+                    <span class="{% if calc > 0 %}text-success{% else %}text-danger{% endif %}">
+                        {{ calc }}
+                    </span>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
