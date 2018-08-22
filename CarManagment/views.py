@@ -11,5 +11,5 @@ def index(request):
     }
     return HttpResponse(template.render(context, request))
 
-def newCar(request):
-    return HttpResponse(request, 'newCar.html') 
+def addCar(request):
+    return HttpResponse(request, 'add_car.html') 
